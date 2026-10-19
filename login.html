@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                
+                <!-- Role Toggle Tabs with Custom Colors -->
+                <ul class="nav nav-pills nav-justified mb-4 p-1 rounded bg-light border" id="loginTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold py-2 custom-tab-citizen" id="citizen-tab" data-bs-toggle="pill" type="button" onclick="setLoginRole('citizen')">
+                            <i class="bi bi-person me-1"></i> Citizen Portal
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold py-2 text-muted custom-tab-admin" id="admin-tab" data-bs-toggle="pill" type="button" onclick="setLoginRole('admin')">
+                            <i class="bi bi-shield-lock me-1"></i> Admin Portal
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Dynamic Title & Icon -->
+                <div class="text-center mb-4">
+                    <h4 class="fw-bold mb-1" id="loginTitle" style="color: #2E7D32;">
+                        <i class="bi bi-person-circle me-1" id="loginIcon"></i> Citizen Portal Login
+                    </h4>
+                    <p class="text-muted small" id="loginSubtitle">Sign in to submit and track your public service requests.</p>
+                </div>
+
+                <form method="POST">
+                    <input type="hidden" name="expected_role" id="expected_role" value="citizen">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email Address</label>
+                        <input type="email" name="email" class="form-control" required placeholder="name@example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Password</label>
+                        <input type="password" name="password" class="form-control" required placeholder="Enter password">
+                    </div>
+                    <button type="submit" class="btn w-100 py-2 fw-semibold text-white" id="loginBtn" style="background-color: #2E7D32;">Login as Citizen</button>
+                </form>
+
+                <div class="text-center mt-4">
+                    <small class="text-muted">Don't have an account? <a href="{{ url_for('auth.register') }}" class="fw-bold text-decoration-none" style="color: #581845;">Register here</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom active states for the tabs */
+    .custom-tab-citizen.active {
+        background-color: #2E7D32 !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 6px rgba(46, 125, 50, 0.3);
+    }
+    .custom-tab-admin.active {
+        background-color: #2C3E50 !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 6px rgba(44, 62, 80, 0.3);
+    }
+</style>
+
+<script>
+    function setLoginRole(role) {
+        document.getElementById('expected_role').value = role;
+        const title = document.getElementById('loginTitle');
+        const subtitle = document.getElementById('loginSubtitle');
+        const icon = document.getElementById('loginIcon');
+        const btn = document.getElementById('loginBtn');
+        const citizenTab = document.getElementById('citizen-tab');
+        const adminTab = document.getElementById('admin-tab');
+        
+        if (role === 'admin') {
+            title.innerHTML = '<i class="bi bi-shield-lock me-2"></i> Admin Portal Login';
+            title.style.color = '#2C3E50';
+            subtitle.innerText = 'Restricted access for authorized administrative personnel only.';
+            btn.innerText = 'Login as Administrator';
+            btn.style.backgroundColor = '#2C3E50';
+            
+            adminTab.classList.add('active');
+            citizenTab.classList.remove('active');
+        } else {
+            title.innerHTML = '<i class="bi bi-person-circle me-2"></i> Citizen Portal Login';
+            title.style.color = '#2E7D32';
+            subtitle.innerText = 'Sign in to submit and track your public service requests.';
+            btn.innerText = 'Login as Citizen';
+            btn.style.backgroundColor = '#2E7D32';
+            
+            citizenTab.classList.add('active');
+            adminTab.classList.remove('active');
+        }
+    }
+</script>
+{% endblock %}

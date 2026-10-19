@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center mt-3">
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="mb-4 fw-bold text-primary"><i class="bi bi-file-earmark-plus"></i> Submit Service Request</h3>
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Service Category</label>
+                        <select name="category" class="form-select" required>
+                            <option value="">Select Category...</option>
+                            <option value="Streetlight">Broken Streetlight</option>
+                            <option value="Water Issue">Water Issue / Leakage</option>
+                            <option value="Garbage Collection">Garbage Collection Problem</option>
+                            <option value="Road Maintenance">Pothole / Road Damage</option>
+                            <option value="Other">Other Public Service</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Location / Landmark</label>
+                        <input type="text" name="location" class="form-control" required placeholder="e.g., Kenyatta Avenue, near Main Stage">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Detailed Description</label>
+                        <textarea name="description" class="form-control" rows="4" required placeholder="Describe the issue in detail..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Optional Photo Evidence</label>
+                        <input type="file" name="image" class="form-control" accept="image/*">
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('citizen.dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4">Submit Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

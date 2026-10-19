@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Modern Executive Command Center Header -->
+<div class="card shadow-sm border-0 mb-4" style="border-left: 5px solid #581845 !important;">
+    <div class="card-body p-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge rounded-pill text-white px-3 py-1" style="background-color: #581845; font-size: 0.75rem; letter-spacing: 0.5px;">COMMAND CENTER</span>
+                    <span class="badge rounded-pill bg-light text-secondary border px-2 py-1" style="font-size: 0.75rem;"><i class="bi bi-shield-check text-success me-1"></i> Secure Admin Access</span>
+                </div>
+                <h2 class="fw-bold mb-1" style="color: #581845;">Administrative Triage Dashboard</h2>
+                <p class="text-muted mb-0 small">Review incoming citizen reports, dispatch resolution teams, and update request statuses in real-time.</p>
+            </div>
+            <div>
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 bg-light border shadow-sm">
+                    <div class="spinner-grow spinner-grow-sm text-success" role="status"></div>
+                    <span class="small fw-semibold text-secondary">System Operational</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics Row -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-start border-primary border-4">
+            <div class="card-body">
+                <h6 class="text-muted mb-1">Total Reports</h6>
+                <h3 class="fw-bold mb-0 text-primary">{{ analytics.total }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-start border-warning border-4">
+            <div class="card-body">
+                <h6 class="text-muted mb-1">Pending Review</h6>
+                <h3 class="fw-bold mb-0 text-warning">{{ analytics.pending }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-start border-info border-4">
+            <div class="card-body">
+                <h6 class="text-muted mb-1">In Progress</h6>
+                <h3 class="fw-bold mb-0 text-info">{{ analytics.in_progress }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-start border-success border-4">
+            <div class="card-body">
+                <h6 class="text-muted mb-1">Resolved</h6>
+                <h3 class="fw-bold mb-0 text-success">{{ analytics.resolved }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter & Search Toolbar -->
+<div class="card shadow-sm border-0 mb-3">
+    <div class="card-body py-3">
+        <form method="GET" action="{{ url_for('admin.dashboard') }}" class="row g-3 align-items-center">
+            <div class="col-md-4">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="search" class="form-control" placeholder="Search location, category..." value="{{ current_search if current_search else '' }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">All Statuses</option>
+                    <option value="Pending" {% if current_status == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="In Progress" {% if current_status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                    <option value="Resolved" {% if current_status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                </select>
+            </div>
+            <div class="col-md-5 d-flex gap-2 justify-content-end">
+                <button type="submit" class="btn btn-sm btn-primary px-3">Filter Queue</button>
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                <a href="{{ url_for('admin.export_csv', status=current_status, search=current_search) }}" class="btn btn-sm btn-success px-3">
+                    <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export CSV
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Requests Table Card -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center py-3" style="color: #581845;">
+        <span><i class="bi bi-list-task me-2"></i> Citizen Service Requests Queue</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Category</th>
+                        <th>Location</th>
+                        <th>Description & Evidence</th>
+                        <th>Status</th>
+                        <th class="pe-3">Admin Action & Comment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in requests %}
+                    <tr>
+                        <td class="fw-bold ps-3">{{ req.category }}</td>
+                        <td>{{ req.location }}</td>
+                        <td>
+                            <div>{{ req.description }}</div>
+                            {% if req.image_filename %}
+                                <div class="mt-2">
+                                    <a href="{{ url_for('static', filename='uploads/' + req.image_filename) }}" target="_blank" class="btn btn-sm btn-outline-secondary py-0 px-2 small">
+                                        <i class="bi bi-image me-1"></i> View Attached Photo
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if req.status == 'Pending' %}
+                                <span class="badge rounded-pill bg-warning text-dark px-3 py-2">Pending</span>
+                            {% elif req.status == 'In Progress' %}
+                                <span class="badge rounded-pill bg-info text-dark px-3 py-2">In Progress</span>
+                            {% else %}
+                                <span class="badge rounded-pill bg-success px-3 py-2">Resolved</span>
+                            {% endif %}
+                        </td>
+                        <td class="pe-3">
+                            <form action="{{ url_for('admin.update_request', request_id=req._id) }}" method="POST" class="row g-2 align-items-center">
+                                <div class="col-auto">
+                                    <select name="status" class="form-select form-select-sm">
+                                        <option value="Pending" {% if req.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                        <option value="In Progress" {% if req.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                        <option value="Resolved" {% if req.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <input type="text" name="admin_comment" class="form-control form-control-sm" placeholder="Add resolution comment..." value="{{ req.admin_comment if req.admin_comment else '' }}">
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-sm btn-primary px-3">Update</button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-2 text-muted d-block mb-2"></i>
+                            No matching service requests found in the system.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
